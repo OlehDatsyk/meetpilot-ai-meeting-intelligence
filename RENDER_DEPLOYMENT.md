@@ -1,6 +1,33 @@
 # Deploying to Render
 
-**Status: the Blueprint is prepared and its build and start commands were tested locally. It has not been deployed to Render yet.** This file will be updated with live results after deployment.
+## Live deployment (2026-11-11)
+
+| | |
+|---|---|
+| Web app | https://meetpilot-frontend.onrender.com |
+| API | https://meetpilot-api-mk2h.onrender.com (Render added the `-mk2h` suffix because the plain name was taken) |
+| Health | https://meetpilot-api-mk2h.onrender.com/health and `/health/ready` |
+| Services | `meetpilot-api` (free web service), `meetpilot-frontend` (static site), created from Blueprint `meetpilot-ai` |
+| Auto-deploy | On every push to `main` |
+
+**Verified live:**
+- `/health` and `/health/ready` (database and storage OK).
+- `/docs` and `/openapi.json` return 404.
+- CORS allows only the web app's origin.
+- HSTS and the security headers are set on the API and the static site.
+- Protected endpoints return 401 without a valid token. Forged tokens and bad media tokens are rejected.
+- Registration validation errors are returned.
+- The public demo API and the sandboxed demo report work.
+- Every web route loads, including direct links to client-side routes.
+- The bundle points at the live API, with no `localhost` URLs and no secrets.
+- The demo page renders from the live API with no console errors.
+- The temporary-data warning shows on registration.
+
+**Not verified live:** registration, sign-in, upload, transcription, reports and deletion with a real account. These pass locally, in Docker Compose and in the automated tests, but nobody has run them on the deployed site yet. AI analysis is not configured (`AI_PROVIDER=none`).
+
+Two problems were found and fixed during deployment:
+- Render applies service environment variables during the build, so `HF_HUB_OFFLINE=1` blocked the model download. The build command now sets `HF_HUB_OFFLINE=0`.
+- The static site's `VITE_API_BASE_URL` had to be changed to the suffixed API URL.
 
 Render facts were checked against the [Blueprint specification](https://render.com/docs/blueprint-spec) on 2026-11-11. Plans and prices change, so check [render.com/pricing](https://render.com/pricing) before creating anything.
 

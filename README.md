@@ -4,6 +4,8 @@
 
 MeetPilot AI is a meeting intelligence platform. Upload a recording and it produces a timestamped transcript, then an AI summary, decisions and action items, each linked back to the transcript lines that support it. You can search everything, ask questions about your meetings, track tasks, and export reports.
 
+**Live demo:** https://meetpilot-frontend.onrender.com (free Render instance: it sleeps when idle, so the first visit can take about a minute, and its data is temporary). The fictional demo meeting is at [/demo](https://meetpilot-frontend.onrender.com/demo) and needs no account.
+
 ![Dashboard (fictional demo workspace)](docs/screenshots/dashboard.png)
 
 ## The problem
