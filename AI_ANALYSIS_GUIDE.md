@@ -77,4 +77,4 @@ Provider error bodies are never shown to users or written to logs.
 
 ## Verification status
 
-All three adapters are tested against mocked SDK transports (request shape, structured output parameters, refusal and auth handling). The analysis pipeline, grounding rules, windowing, fallbacks and the assistant are tested with fake providers. **None of the three providers has been called with a real key in this project.** Run a real analysis before relying on a provider in production.
+All three adapters are tested against mocked SDK transports (request shape, structured output parameters, refusal and auth handling). The analysis pipeline, grounding rules, windowing, fallbacks and the assistant are tested with fake providers. On the live Render site, the owner configured one provider with a real key and reported that summaries are generated correctly. The other two providers have not been called with a real key. Run a real analysis before relying on them in production.

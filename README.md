@@ -143,7 +143,7 @@ TEST_DATABASE_URL=postgresql+psycopg://... python -m pytest   # same suite on Po
 cd frontend && npm test                 # 8 tests
 ```
 
-Provider calls in the automated tests are mocked. Local Whisper transcription was tested for real; the OpenAI, Anthropic and Gemini integrations have **not** been tested against the live services, because no API keys were available. See [TESTING.md](TESTING.md).
+Provider calls in the automated tests are mocked. Local Whisper transcription was tested with real audio. AI analysis was checked on the live site with the provider the owner configured; the owner reported it working. The other AI adapters and OpenAI speech-to-text are covered by mocked tests only. See [TESTING.md](TESTING.md).
 
 ## Security and privacy
 
@@ -153,7 +153,7 @@ MeetPilot AI has not been audited for GDPR or any other regulation. You are resp
 
 ## Limitations
 
-- OpenAI, Anthropic and Gemini adapters are verified only against mocked responses.
+- Only one AI provider (the one configured on the live site) has been checked with a real key. The other adapters and OpenAI speech-to-text are covered by mocked tests only.
 - Local Whisper does not identify speakers. Speaker labels from OpenAI are only consistent within one request, so very long recordings split into parts may show more speakers than there were (rename them to merge).
 - Rate limits are per process, not shared across several API instances.
 - Search is keyword based. There is no semantic search.

@@ -56,7 +56,7 @@ npm run build
 |---|---|---|
 | Local transcription (faster-whisper `tiny`) | Indirectly through the job pipeline with fake providers | **Live, passed:** a 30-second, two-voice English clip (made with Windows text-to-speech, not committed) was transcribed accurately with timestamps and language "en". Run directly, through the API job queue (local dev server), and through Docker Compose with a separate worker container and PostgreSQL |
 | OpenAI speech-to-text | Mocked HTTP transport | **Not tested live** (no API key available) |
-| OpenAI, Anthropic, Gemini analysis and assistant | Mocked transport or client | **Not tested live** (no API keys available) |
+| AI analysis and assistant | Mocked transport or client for all three providers | **Live, owner-reported:** after the owner added a key on Render, AI summaries worked on the deployed site. Only the configured provider was exercised; the other two remain mock-only |
 | S3 storage | moto (in-memory AWS) | Not tested against a real bucket |
 | SMTP password-reset email | Not tested | Not tested |
 
