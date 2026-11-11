@@ -17,7 +17,7 @@ services:
     plan: free
     region: frankfurt
     rootDir: backend
-    buildCommand: pip install --disable-pip-version-check -r requirements-local.txt && python scripts/download_whisper_model.py tiny ./models
+    buildCommand: pip install --disable-pip-version-check -r requirements-local.txt && HF_HUB_OFFLINE=0 python scripts/download_whisper_model.py tiny ./models
     # preDeployCommand is paid-only, so migrations run at start. Safe with a single instance.
     startCommand: python -m alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*' --timeout-graceful-shutdown 20
     healthCheckPath: /health
@@ -56,7 +56,7 @@ services:
         value: ./models
       - key: LOCAL_WHISPER_THREADS
         value: "1"
-      # The model is downloaded during the build; never contact the Hugging Face Hub at runtime.
+      # The model is downloaded during the build (which overrides this to 0); never contact the Hugging Face Hub at runtime.
       - key: HF_HUB_OFFLINE
         value: "1"
       - key: EMBEDDED_WORKER

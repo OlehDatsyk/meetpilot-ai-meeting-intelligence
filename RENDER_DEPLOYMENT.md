@@ -33,7 +33,7 @@ API (`rootDir: backend`):
 
 ```bash
 # build
-pip install --disable-pip-version-check -r requirements-local.txt && python scripts/download_whisper_model.py tiny ./models
+pip install --disable-pip-version-check -r requirements-local.txt && HF_HUB_OFFLINE=0 python scripts/download_whisper_model.py tiny ./models
 # start (migrations run here because preDeployCommand is paid-only)
 python -m alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*' --timeout-graceful-shutdown 20
 ```
