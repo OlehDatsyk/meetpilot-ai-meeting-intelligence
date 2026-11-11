@@ -157,7 +157,7 @@ function Providers() {
         {row("AI analysis and assistant", s.ai.configured, s.ai.configured
           ? `${s.ai.provider} / ${s.ai.model}${s.ai.fallbacks?.length ? ` · fallback: ${s.ai.fallbacks.map((f) => f.provider).join(", ")}` : ""}`
           : s.ai.error || "Not configured. Set AI_PROVIDER and an API key on the server.")}
-        {row("Storage", s.storage.persistent, `${s.storage.provider}${s.storage.persistent ? "" : " · temporary: files can be lost when the server restarts"}`)}
+        {row("Storage", s.storage.persistent && s.storage.database_persistent, `${s.storage.provider}${s.storage.persistent ? "" : " · temporary: files can be lost when the server restarts"}${s.storage.database_persistent ? "" : " · the database is temporary too: all data is deleted on restart"}`)}
         {row("Uploads", true, `${s.uploads.extensions.join(", ")} · up to ${s.uploads.max_size_mb} MB and ${s.uploads.max_duration_minutes} min${s.uploads.ffmpeg_available ? "" : " · ffmpeg missing, so long files cannot be split"}`)}
         {row("Search", true, "Keyword search. Semantic (embedding) search is not implemented.")}
         {row("Password reset email", s.password_reset_email, s.password_reset_email ? "Configured" : "No mail server configured")}

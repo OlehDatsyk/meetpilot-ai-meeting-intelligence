@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     storage_provider: Literal["local", "s3"] = "local"
     storage_root: str = "./data/storage"
     storage_persistent: bool = True
+    database_persistent: bool = True  # false: the database itself is temporary (e.g. SQLite on an ephemeral disk)
     s3_bucket: str = ""
     s3_region: str = ""
     s3_endpoint_url: str = ""

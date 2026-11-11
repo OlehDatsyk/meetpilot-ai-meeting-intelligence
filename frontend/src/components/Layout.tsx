@@ -122,7 +122,8 @@ export function AppLayout() {
   const location = useLocation();
   useEffect(() => setOpen(false), [location.pathname]);
   const status = useQuery({ queryKey: ["system-status"], queryFn: () => get<SystemStatus>("/api/v1/system/status"), staleTime: 300_000 });
-  const ephemeral = status.data && !status.data.storage.persistent;
+  const ephemeralFiles = status.data && !status.data.storage.persistent;
+  const ephemeralDb = status.data && !status.data.storage.database_persistent;
 
   return (
     <div className="flex h-full">
@@ -146,9 +147,11 @@ export function AppLayout() {
             You are in the demo workspace. Its meetings, people and company are fictional sample data.
           </div>
         )}
-        {ephemeral && (
+        {(ephemeralDb || ephemeralFiles) && (
           <div className="border-b border-slate-200 bg-slate-100 px-4 py-2 text-center text-xs text-slate-700 sm:px-6">
-            This server uses temporary storage: uploaded audio and generated report files can disappear when it restarts.
+            {ephemeralDb
+              ? "Demo server with temporary storage: your account and all data are deleted whenever the server restarts or sleeps. Do not upload anything you need to keep."
+              : "This server uses temporary storage: uploaded audio and generated report files can disappear when it restarts."}
           </div>
         )}
         <main className="flex-1 overflow-y-auto">

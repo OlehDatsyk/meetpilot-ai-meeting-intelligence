@@ -1,13 +1,14 @@
 # Render Blueprint for MeetPilot AI. Spec: https://render.com/docs/blueprint-spec
 #
-# Everything here uses FREE plans, so applying it creates no charges. Free-plan limits (see RENDER_DEPLOYMENT.md):
-#   - Free web services have no persistent disk: uploaded audio and generated report files are lost on restart,
-#     redeploy or sleep. STORAGE_PERSISTENT=false shows users a warning. Transcripts and analysis are in Postgres.
-#   - Free web services sleep after 15 minutes without traffic; the next request takes about a minute.
-#   - Free Postgres expires 30 days after creation.
+# This Blueprint creates only FREE resources: a static site and a free web service. No database service is created,
+# because a Render workspace can have only one free Postgres database. Free-plan consequences (see RENDER_DEPLOYMENT.md):
+#   - The API stores everything in SQLite and files under /tmp on the instance's temporary disk. Accounts, meetings,
+#     transcripts, audio and reports are deleted whenever the service restarts, redeploys or sleeps (after 15 minutes
+#     without traffic). DATABASE_PERSISTENT=false and STORAGE_PERSISTENT=false make the app warn every user about this.
 #   - Background workers have no free plan, so the job worker runs inside the API process (EMBEDDED_WORKER=true).
-# Transcription runs locally on the API instance with faster-whisper "tiny" (no API key, no speaker detection).
-# To use OpenAI transcription or an AI provider, set the variables marked "optional" in the Render dashboard.
+#   - Transcription runs locally with faster-whisper "tiny" (no API key, no speaker detection).
+# To keep data, use a paid Postgres database: uncomment the "databases" block at the end, replace the DATABASE_URL entry
+# with the fromDatabase version shown there, and set DATABASE_PERSISTENT=true.
 
 services:
   - type: web
@@ -27,9 +28,9 @@ services:
       - key: ENVIRONMENT
         value: production
       - key: DATABASE_URL
-        fromDatabase:
-          name: meetpilot-database
-          property: connectionString
+        value: sqlite:////tmp/meetpilot/meetpilot.db
+      - key: DATABASE_PERSISTENT
+        value: "false"
       - key: SECRET_KEY
         generateValue: true
       # Prompted once: the static site's URL, e.g. https://meetpilot-frontend.onrender.com
@@ -99,8 +100,14 @@ services:
         name: Cache-Control
         value: public, max-age=31536000, immutable
 
-databases:
-  - name: meetpilot-database
-    plan: free
-    region: frankfurt
-    postgresMajorVersion: "16"
+# Paid alternative (Render Postgres 0.1c-256mb: $6/month plus storage at $0.30/GB on 2026-11-11):
+# databases:
+#   - name: meetpilot-database
+#     plan: 0.1c-256mb
+#     region: frankfurt
+#     postgresMajorVersion: "16"
+# and in meetpilot-api envVars:
+#   - key: DATABASE_URL
+#     fromDatabase:
+#       name: meetpilot-database
+#       property: connectionString

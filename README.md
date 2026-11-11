@@ -156,7 +156,7 @@ MeetPilot AI has not been audited for GDPR or any other regulation. You are resp
 - Rate limits are per process, not shared across several API instances.
 - Search is keyword based. There is no semantic search.
 - Password-reset emails need an SMTP server.
-- On Render's free plan, audio and report files are temporary. See [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md).
+- The free Render deployment keeps its SQLite database and files on a temporary disk, so all data there is deleted whenever the service restarts or sleeps. It is a demonstration. See [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md).
 
 ## Roadmap
 

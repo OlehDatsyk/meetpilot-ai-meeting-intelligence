@@ -71,6 +71,7 @@ export function LoginPage() {
         <p>No account? <Link className="font-medium text-accent hover:underline" to="/register">Create one</Link></p>
         <p className="mt-2">Just looking? <Link className="font-medium text-accent hover:underline" to="/demo">Explore the demo meeting</Link> (no account needed).</p>
       </>}>
+      <TemporaryServerNotice />
       <form onSubmit={submit} className="space-y-4">
         <ErrorBox error={error} />
         <Field label="Email" htmlFor="email"><input id="email" type="email" autoComplete="email" required className="input" value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
@@ -82,6 +83,12 @@ export function LoginPage() {
       </form>
     </AuthShell>
   );
+}
+
+function TemporaryServerNotice() {
+  const config = useQuery({ queryKey: ["public-config"], queryFn: () => get<{ database_persistent: boolean; password_reset_email: boolean }>("/api/v1/system/config") });
+  if (!config.data || config.data.database_persistent) return null;
+  return <div className="mb-4"><Notice tone="amber">This is a demo server with temporary storage. Accounts and all data are deleted whenever it restarts or sleeps (after about 15 minutes without visitors).</Notice></div>;
 }
 
 export function RegisterPage() {
@@ -108,6 +115,7 @@ export function RegisterPage() {
   return (
     <AuthShell title="Create your account" subtitle="A private workspace is created for you."
       footer={<p>Already have an account? <Link className="font-medium text-accent hover:underline" to="/login">Sign in</Link></p>}>
+      <TemporaryServerNotice />
       <form onSubmit={submit} className="space-y-4">
         <ErrorBox error={error} />
         <Field label="Name" htmlFor="name"><input id="name" required maxLength={120} autoComplete="name" className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>

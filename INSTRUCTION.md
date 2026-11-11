@@ -59,6 +59,7 @@ Open http://localhost:5173. The dev server proxies `/api` to port 8000. Run comm
 | `STORAGE_PROVIDER` | | `local` | `local` or `s3` |
 | `STORAGE_ROOT` | | `./data/storage` | Folder for local storage |
 | `STORAGE_PERSISTENT` | | `true` | `false` shows users a temporary-storage warning |
+| `DATABASE_PERSISTENT` | | `true` | `false` warns users that accounts and data are deleted on restart (SQLite on a temporary disk) |
 | `S3_BUCKET`, `S3_REGION`, `S3_ENDPOINT_URL`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PREFIX` | with s3 | | Private S3-compatible bucket |
 | `MAX_AUDIO_SIZE_MB` | | `200` | Upload size limit |
 | `MAX_AUDIO_DURATION_MINUTES` | | `240` | Recording length limit |

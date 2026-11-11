@@ -7,7 +7,7 @@ MeetPilot AI processes recordings of conversations, which can be confidential. T
 - Uploaded audio is stored as a file (local disk or a private S3-compatible bucket), never in the database. The database holds the storage key, file name, format, size, duration, sample rate, channels and a SHA-256 hash.
 - Files are not publicly reachable. Playback uses a 15-minute token bound to the recording and the user, and workspace membership is re-checked when the audio is streamed. With S3, 15-minute pre-signed URLs to a private bucket are used.
 - Temporary copies made for conversion and splitting are deleted when the job ends, whether it succeeds or fails. Upload buffers are deleted immediately.
-- On Render's free plan, storage is the instance's temporary disk, so audio and report files can disappear on restart. Users see a warning.
+- On the free Render deployment, the database and all files are on the instance's temporary disk and are deleted on restart, redeploy or sleep. Users see a warning.
 
 ## Transcript storage
 
@@ -38,7 +38,7 @@ Files are deleted after the database change is committed. Data already sent to a
 
 ## Retention
 
-Admins can set **Delete recording audio after N days** per workspace. The worker checks hourly (`RETENTION_SWEEP_MINUTES`) and deletes older audio, skipping meetings that are being processed. Transcripts and analysis are kept until a user deletes them. Without a retention period, data is kept until deleted. Render's free PostgreSQL expires 30 days after creation, which deletes all data in it.
+Admins can set **Delete recording audio after N days** per workspace. The worker checks hourly (`RETENTION_SWEEP_MINUTES`) and deletes older audio, skipping meetings that are being processed. Transcripts and analysis are kept until a user deletes them. Without a retention period, data is kept until deleted, except on temporary-storage deployments (`DATABASE_PERSISTENT=false`), where everything is deleted when the server restarts.
 
 ## Access control
 

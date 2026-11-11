@@ -313,7 +313,7 @@ export interface SystemStatus {
     fallbacks?: { provider: string; model: string }[];
     error?: string | null;
   };
-  storage: { provider: string; persistent: boolean };
+  storage: { provider: string; persistent: boolean; database_persistent: boolean };
   uploads: { max_size_mb: number; max_duration_minutes: number; extensions: string[]; ffmpeg_available: boolean };
   worker: { embedded: boolean };
   semantic_search: boolean;

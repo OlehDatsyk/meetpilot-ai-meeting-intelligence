@@ -48,7 +48,7 @@ def public_config():
     """Non-secret settings the sign-in pages need before a user is authenticated."""
     s = get_settings()
     return {"version": __version__, "demo_enabled": s.demo_enabled, "password_reset_email": reset_email_available(),
-            "environment": s.environment}
+            "environment": s.environment, "database_persistent": s.database_persistent}
 
 
 @router.get("/api/v1/system/status")
@@ -60,7 +60,8 @@ def system_status(_: User = Depends(get_current_user)):
         "environment": s.environment,
         "transcription": transcription_status(),
         "ai": ai_status(),
-        "storage": {"provider": s.storage_provider, "persistent": s.storage_persistent},
+        "storage": {"provider": s.storage_provider, "persistent": s.storage_persistent,
+                    "database_persistent": s.database_persistent},
         "uploads": {"max_size_mb": s.max_audio_size_mb, "max_duration_minutes": s.max_audio_duration_minutes,
                     "extensions": ALLOWED_EXTENSIONS, "ffmpeg_available": ffmpeg_exe() is not None},
         "worker": {"embedded": s.embedded_worker},
