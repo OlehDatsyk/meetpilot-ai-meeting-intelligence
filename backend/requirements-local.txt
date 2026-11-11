@@ -1,0 +1,3 @@
+-r requirements.txt
+# Local speech-to-text (TRANSCRIPTION_PROVIDER=local). Downloads a Whisper model on first use.
+faster-whisper==1.2.1

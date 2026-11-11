@@ -1,0 +1,106 @@
+# Render Blueprint for MeetPilot AI. Spec: https://render.com/docs/blueprint-spec
+#
+# Everything here uses FREE plans, so applying it creates no charges. Free-plan limits (see RENDER_DEPLOYMENT.md):
+#   - Free web services have no persistent disk: uploaded audio and generated report files are lost on restart,
+#     redeploy or sleep. STORAGE_PERSISTENT=false shows users a warning. Transcripts and analysis are in Postgres.
+#   - Free web services sleep after 15 minutes without traffic; the next request takes about a minute.
+#   - Free Postgres expires 30 days after creation.
+#   - Background workers have no free plan, so the job worker runs inside the API process (EMBEDDED_WORKER=true).
+# Transcription runs locally on the API instance with faster-whisper "tiny" (no API key, no speaker detection).
+# To use OpenAI transcription or an AI provider, set the variables marked "optional" in the Render dashboard.
+
+services:
+  - type: web
+    name: meetpilot-api
+    runtime: python
+    plan: free
+    region: frankfurt
+    rootDir: backend
+    buildCommand: pip install --disable-pip-version-check -r requirements-local.txt && python scripts/download_whisper_model.py tiny ./models
+    # preDeployCommand is paid-only, so migrations run at start. Safe with a single instance.
+    startCommand: python -m alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*' --timeout-graceful-shutdown 20
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: meetpilot-database
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      # Prompted once: the static site's URL, e.g. https://meetpilot-frontend.onrender.com
+      - key: CORS_ORIGINS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: STORAGE_PROVIDER
+        value: local
+      - key: STORAGE_ROOT
+        value: /tmp/meetpilot
+      - key: STORAGE_PERSISTENT
+        value: "false"
+      - key: MAX_AUDIO_SIZE_MB
+        value: "50"
+      - key: MAX_AUDIO_DURATION_MINUTES
+        value: "60"
+      - key: TRANSCRIPTION_PROVIDER
+        value: local
+      - key: LOCAL_WHISPER_MODEL
+        value: tiny
+      - key: LOCAL_WHISPER_MODEL_DIR
+        value: ./models
+      - key: LOCAL_WHISPER_THREADS
+        value: "1"
+      # The model is downloaded during the build; never contact the Hugging Face Hub at runtime.
+      - key: HF_HUB_OFFLINE
+        value: "1"
+      - key: EMBEDDED_WORKER
+        value: "true"
+      - key: LOG_LEVEL
+        value: INFO
+      # Optional: set AI_PROVIDER (openai | anthropic | gemini) and AI_API_KEY in the dashboard to enable analysis.
+      - key: AI_PROVIDER
+        value: none
+      - key: AI_API_KEY
+        sync: false
+
+  - type: web
+    name: meetpilot-frontend
+    runtime: static
+    buildCommand: cd frontend && npm ci --include=dev --no-fund --no-audit && npm run build
+    staticPublishPath: frontend/dist
+    autoDeployTrigger: commit
+    envVars:
+      # Prompted once: the API's URL, e.g. https://meetpilot-api.onrender.com
+      - key: VITE_API_BASE_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /*
+        name: Content-Security-Policy
+        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' https://*.onrender.com blob:; font-src 'self'; connect-src 'self' https://*.onrender.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+
+databases:
+  - name: meetpilot-database
+    plan: free
+    region: frankfurt
+    postgresMajorVersion: "16"
