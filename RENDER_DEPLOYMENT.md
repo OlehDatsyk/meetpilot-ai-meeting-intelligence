@@ -23,7 +23,7 @@
 - The demo page renders from the live API with no console errors.
 - The temporary-data warning shows on registration.
 
-**Not verified live:** registration, sign-in, upload, transcription, reports and deletion with a real account. These pass locally, in Docker Compose and in the automated tests, but nobody has run them on the deployed site yet. AI analysis is not configured (`AI_PROVIDER=none`).
+**Signed-in flows** (registration, sign-in, upload, transcription, reports, deletion) were tested on the live site by the repository owner, who reported that everything works. They were not independently checked against the server logs. The same flows also pass locally, in Docker Compose and in the automated tests. AI analysis is not configured (`AI_PROVIDER=none`).
 
 Two problems were found and fixed during deployment:
 - Render applies service environment variables during the build, so `HF_HUB_OFFLINE=1` blocked the model download. The build command now sets `HF_HUB_OFFLINE=0`.
