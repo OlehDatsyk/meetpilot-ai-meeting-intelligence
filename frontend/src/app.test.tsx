@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ActionList } from "./components/records";
+import LandingPage from "./pages/Landing";
 import { Highlight } from "./components/ui";
 import { api, ApiError, qs } from "./lib/api";
 import { dueLabel, formatDuration, formatTimestamp, ownerLabel } from "./lib/format";
@@ -75,5 +76,34 @@ describe("api client", () => {
     vi.spyOn(globalThis, "fetch").mockRejectedValue(new TypeError("fetch failed"));
     const err = (await api("/x").catch((e: unknown) => e)) as ApiError;
     expect(err.code).toBe("network_error");
+  });
+});
+
+describe("LandingPage", () => {
+  afterEach(() => vi.restoreAllMocks());
+  const config = (persistent: boolean) =>
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ database_persistent: persistent, password_reset_email: false }), { status: 200 }));
+
+  it("links its calls to action to real routes", async () => {
+    config(true);
+    render(wrap(<LandingPage />));
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/meaningful progress/i);
+    expect(screen.getAllByRole("link", { name: /create a free account/i })[0]).toHaveAttribute("href", "/register");
+    expect(screen.getAllByRole("link", { name: /explore the demo/i })[0]).toHaveAttribute("href", "/demo");
+    expect(screen.getByRole("link", { name: /sign in/i })).toHaveAttribute("href", "/login");
+    expect(screen.getByRole("link", { name: /privacy/i })).toHaveAttribute("href", "/privacy");
+    expect(screen.queryByText(/temporary storage/i)).not.toBeInTheDocument();
+  });
+
+  it("warns visitors when the server keeps data only temporarily", async () => {
+    config(false);
+    render(wrap(<LandingPage />));
+    expect(await screen.findByText(/temporary storage/i)).toBeInTheDocument();
+  });
+
+  it("makes no testimonial, customer-count or pricing-plan claims", () => {
+    config(true);
+    const { container } = render(wrap(<LandingPage />));
+    expect(container.textContent).not.toMatch(/testimonial|trusted by|\d[\d,]*\+? (teams|customers|users)|per month|\/mo\b/i);
   });
 });

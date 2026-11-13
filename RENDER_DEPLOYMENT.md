@@ -25,6 +25,15 @@
 
 **Signed-in flows** (registration, sign-in, upload, transcription, reports, deletion) were tested on the live site by the repository owner, who reported that everything works. They were not independently checked against the server logs. The same flows also pass locally, in Docker Compose and in the automated tests. After deployment, the owner set `AI_PROVIDER` and `AI_API_KEY` on `meetpilot-api` in the dashboard and reported that AI summaries work on the live site. The key is stored only in Render and never in the repository.
 
+**Independent audit (2026-11-13).** Re-checked from outside, without relying on earlier reports:
+- `/health` answered after a 62-second cold start (the free instance had been asleep, so its temporary SQLite data had already been wiped), then `/health/ready` reported database and storage OK.
+- `/docs` and `/openapi.json` return 404. Unauthenticated and forged-token requests return 401 with no internal details. Malformed JSON and invalid emails return clean validation errors.
+- CORS rejects a foreign origin (400 on preflight) and allows only the web app's origin.
+- HTTP redirects to HTTPS. HSTS, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy` and the CSP are present.
+- The JavaScript bundle points at the live API, contains no secrets, and makes no `localhost` requests (the only `localhost` string is React Router's URL-parsing fallback).
+- `/login`, `/register` and `/demo` load with no console errors and no failed requests, and fit a 375 px phone screen without horizontal scrolling.
+- **Not checked by the auditor on the live site:** signed-in flows (registration, upload, transcription, AI analysis, exports, deletion). The auditor does not enter passwords on production sites. The same flows passed a 53-check end-to-end run against a local instance, described in [TESTING.md](TESTING.md).
+
 Two problems were found and fixed during deployment:
 - Render applies service environment variables during the build, so `HF_HUB_OFFLINE=1` blocked the model download. The build command now sets `HF_HUB_OFFLINE=0`.
 - The static site's `VITE_API_BASE_URL` had to be changed to the suffixed API URL.

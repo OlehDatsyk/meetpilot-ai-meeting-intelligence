@@ -1,4 +1,4 @@
-export function Logo({ dark = false }: { dark?: boolean }) {
+export function Logo({ dark = false, compact = false }: { dark?: boolean; compact?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
       <svg viewBox="0 0 32 32" className="size-8" aria-hidden>
@@ -7,7 +7,7 @@ export function Logo({ dark = false }: { dark?: boolean }) {
       </svg>
       <div className="leading-tight">
         <div className={`text-[15px] font-semibold tracking-tight ${dark ? "text-white" : "text-ink"}`}>MeetPilot AI</div>
-        <div className={`text-[11px] ${dark ? "text-slate-400" : "text-muted"}`}>Turn conversations into clear outcomes</div>
+        <div className={`text-[11px] ${dark ? "text-slate-400" : "text-muted"} ${compact ? "hidden sm:block" : ""}`}>Turn conversations into clear outcomes</div>
       </div>
     </div>
   );

@@ -23,11 +23,27 @@ npm run build
 | Backend, PostgreSQL 16 (Docker), migration-diff test excluded because it uses its own SQLite file | **84 passed** |
 | Alembic `upgrade head` and `downgrade base` on PostgreSQL 16 | Passed |
 | Frontend type-check (`tsc -b`, strict) | Passed |
-| Frontend unit tests (Vitest) | **8 passed** |
+| Frontend unit tests (Vitest) | **11 passed** |
 | Frontend production build | Passed |
 | `npm audit` | 0 vulnerabilities |
 | `pip-audit` (requirements-local.txt and requirements-dev.txt) | No known vulnerabilities |
 | `ruff` (pyflakes and bugbear rules) | No findings |
+
+## Production audit, 2026-11-13
+
+An end-to-end script ran 53 API checks against a local instance (fresh SQLite database, local Whisper `tiny`, no AI key), using a synthesised recording of a fictional meeting. All 53 passed:
+
+- Registration, sign-in, wrong-password rejection, logout revoking the token, account deletion.
+- Meeting and project creation and editing. Uploads of fake audio and an `.exe` are rejected with 415.
+- A real WAV upload, transcribed by local Whisper in about 12 seconds, with timestamped segments that match the spoken text.
+- Transcript editing and reverting. Analysis without an AI key returns a clear `503 ai_not_configured`, not mock data.
+- Action items created, edited and completed. Decisions created. Search finds transcript passages and action items.
+- The assistant in retrieval-only mode cites only the user's own meeting.
+- PDF, HTML and SRT exports, stored reports, signed audio playback.
+- A second user gets 404 on 11 kinds of access to the first user's meeting, transcript, segments, action items, workspace, search, media, reports and conversation, and their assistant finds none of the first user's records.
+- After deletion, the meeting, its action items, audio stream and search results are all gone.
+
+On the live site, only the signed-out surface was checked by the auditor (see [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md)).
 
 ## What the automated tests cover
 
@@ -48,7 +64,7 @@ npm run build
 | Dashboard and analytics | Figures match the stored records. Success rate is `null` when no jobs have finished |
 | Demo | Public demo payload (every demo action cites existing demo lines), demo report, demo workspace created once, PDF from demo data |
 | Migrations | `alembic upgrade head` produces exactly the models' schema |
-| Frontend | Formatting, "Unassigned" and "No deadline specified" labels, AI suggestion and interpreted-date labels, multi-term highlighting with regex escaping, API error and network error handling |
+| Frontend | Formatting, "Unassigned" and "No deadline specified" labels, AI suggestion and interpreted-date labels, multi-term highlighting with regex escaping, API error and network error handling, landing page links, the temporary-storage warning, and the absence of testimonial or pricing claims |
 
 ## Mocked versus live provider tests
 

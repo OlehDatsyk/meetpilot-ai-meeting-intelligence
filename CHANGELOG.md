@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.0] - 2026-11-13
+
+### Added
+- Public landing page at `/` for signed-out visitors: product introduction, features, how it works, grounding approach, previews of the real app (fictional demo data), use cases, open-source information and a footer with documentation, privacy, contact and source links. Signed-in users still go straight to the dashboard. No testimonials, customer numbers or pricing plans.
+- Frontend tests for the landing page.
+
 ## [1.0.0] - 2026-11-11
 
 First release.

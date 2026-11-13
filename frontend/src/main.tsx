@@ -13,6 +13,7 @@ import AssistantPage from "./pages/Assistant";
 import { ForgotPasswordPage, LoginPage, RegisterPage, ResetPasswordPage } from "./pages/Auth";
 import DecisionsPage from "./pages/Decisions";
 import DemoPage from "./pages/Demo";
+import LandingPage from "./pages/Landing";
 import MeetingDetailPage from "./pages/MeetingDetail";
 import MeetingsPage from "./pages/Meetings";
 import NotFoundPage from "./pages/NotFound";
@@ -39,6 +40,8 @@ function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loading, workspace } = useSession();
   const location = useLocation();
   if (loading) return <Spinner label="Loading your workspace" />;
+  // Signed-out visitors to the site root see the public landing page; other app URLs go to sign-in.
+  if (!user && location.pathname === "/") return <LandingPage />;
   if (!user) return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   if (!workspace) return <Spinner label="Loading your workspace" />;
   return <>{children}</>;

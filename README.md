@@ -34,6 +34,7 @@ These are implemented and covered by automated tests unless noted.
 | Reports | PDF (Unicode fonts) and HTML reports, plus TXT, SRT, VTT, JSON, Markdown and CSV exports |
 | Analytics | Meetings and minutes per week, action items created and completed, decisions by project, processing success rate, all computed from stored records |
 | Privacy | Private storage, short-lived playback links, deletion of meetings, audio only, workspaces or accounts, and an optional audio retention period |
+| Landing page | Public product page at `/` for signed-out visitors, with previews of the real app. No testimonials, invented numbers or pricing plans |
 | Demo | A public read-only demo meeting (no account needed) and an optional editable demo workspace. Both are clearly labelled fictional |
 
 **Not implemented:** live note-taking, calendar or chat integrations (Google Calendar, Outlook, Slack, Teams, Notion, Trello, Asana), and semantic (embedding) search. See the [roadmap](#roadmap).
@@ -140,7 +141,7 @@ REST API under `/api/v1` with bearer-token authentication, Pydantic validation, 
 ```bash
 cd backend && python -m pytest          # 85 tests (SQLite)
 TEST_DATABASE_URL=postgresql+psycopg://... python -m pytest   # same suite on PostgreSQL
-cd frontend && npm test                 # 8 tests
+cd frontend && npm test                 # 11 tests
 ```
 
 Provider calls in the automated tests are mocked. Local Whisper transcription was tested with real audio. AI analysis was checked on the live site with the provider the owner configured; the owner reported it working. The other AI adapters and OpenAI speech-to-text are covered by mocked tests only. See [TESTING.md](TESTING.md).
